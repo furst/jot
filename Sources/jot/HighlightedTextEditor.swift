@@ -76,6 +76,57 @@ struct HighlightedTextEditor: NSViewRepresentable {
             self.parent = parent
         }
 
+        // Auto-continue markdown list prefixes on Enter
+        func textView(_ textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+            guard commandSelector == #selector(NSResponder.insertNewline(_:)) else { return false }
+
+            let text = textView.string as NSString
+            let cursorLocation = textView.selectedRange().location
+            let lineRange = text.lineRange(for: NSRange(location: cursorLocation, length: 0))
+            let line = text.substring(with: lineRange).trimmingCharacters(in: .newlines)
+
+            // Match list prefixes: "- ", "* ", "- [ ] ", "- [x] ", or "1. " style
+            let patterns: [(regex: String, nextPrefix: (String) -> String)] = [
+                (#"^(\s*)- \[[x ]\] "#, { m in
+                    let indent = String(m[m.startIndex..<(m.range(of: "-")!.lowerBound)])
+                    return "\(indent)- [ ] "
+                }),
+                (#"^(\s*)([-*]) "#, { m in
+                    let dashRange = m.range(of: "-") ?? m.range(of: "*")!
+                    let indent = String(m[m.startIndex..<dashRange.lowerBound])
+                    let marker = String(m[dashRange])
+                    return "\(indent)\(marker) "
+                }),
+                (#"^(\s*)(\d+)\. "#, { m in
+                    // Extract indent and number
+                    guard let numRange = m.range(of: #"\d+"#, options: .regularExpression) else { return "1. " }
+                    let indent = String(m[m.startIndex..<numRange.lowerBound])
+                    let num = Int(m[numRange]) ?? 0
+                    return "\(indent)\(num + 1). "
+                }),
+            ]
+
+            for (pattern, nextPrefix) in patterns {
+                guard let match = line.range(of: pattern, options: .regularExpression) else { continue }
+                let matched = String(line[match])
+                let prefix = nextPrefix(matched)
+
+                // If the line is ONLY the prefix (empty list item), clear it instead
+                let content = String(line[match.upperBound...])
+                if content.trimmingCharacters(in: .whitespaces).isEmpty {
+                    let replaceRange = NSRange(location: lineRange.location, length: lineRange.length - (text.substring(with: lineRange).hasSuffix("\n") ? 1 : 0))
+                    textView.insertText("", replacementRange: replaceRange)
+                    return true
+                }
+
+                textView.insertNewlineIgnoringFieldEditor(nil)
+                textView.insertText(prefix, replacementRange: textView.selectedRange())
+                return true
+            }
+
+            return false
+        }
+
         func textDidChange(_ notification: Notification) {
             guard let textView = notification.object as? NSTextView else { return }
             parent.text = textView.string
@@ -91,7 +142,7 @@ struct HighlightedTextEditor: NSViewRepresentable {
                 textView.selectedRanges = selectedRanges
             }
             highlightWorkItem = workItem
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: workItem)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: workItem)
         }
     }
 }
