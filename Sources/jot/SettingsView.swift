@@ -9,23 +9,31 @@ struct GeneralSettingsView: View {
 
     var body: some View {
         Form {
-            Toggle("Launch at Login", isOn: $launchAtLogin)
-                .accessibilityLabel("Launch at Login")
-                .accessibilityHint("Start jot automatically when you log in")
-                .onChange(of: launchAtLogin) { newValue in
-                    do {
-                        if newValue {
-                            try SMAppService.mainApp.register()
-                        } else {
-                            try SMAppService.mainApp.unregister()
+            LabeledContent("Launch at Login") {
+                Toggle("", isOn: $launchAtLogin)
+                    .labelsHidden()
+                    .accessibilityLabel("Launch at Login")
+                    .accessibilityHint("Start jot automatically when you log in")
+                    .onChange(of: launchAtLogin) { newValue in
+                        do {
+                            if newValue {
+                                try SMAppService.mainApp.register()
+                            } else {
+                                try SMAppService.mainApp.unregister()
+                            }
+                        } catch {
+                            launchAtLogin = !newValue
                         }
-                    } catch {
-                        launchAtLogin = !newValue
                     }
-                }
+            }
 
-            Section("Global Shortcut") {
+            Section {
                 ShortcutRecorder()
+                Text("Press Change, then type your preferred key combination to activate jot from anywhere.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            } header: {
+                Text("Global Shortcut")
             }
         }
         .formStyle(.grouped)
@@ -46,37 +54,52 @@ struct NotesSettingsView: View {
     var body: some View {
         Form {
             Section("Save Location") {
-                HStack {
-                    TextField("Path", text: $saveDirectory)
-                        .textFieldStyle(.roundedBorder)
-                        .onSubmit { Preferences.saveDirectory = saveDirectory }
-                        .accessibilityLabel("Save directory path")
-                        .accessibilityHint("File path where notes are saved")
+                LabeledContent("Folder") {
+                    HStack(spacing: 6) {
+                        Image(systemName: "folder.fill")
+                            .foregroundStyle(.secondary)
+                        Text(saveDirectory)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                            .foregroundStyle(.primary)
+                            .help(saveDirectory)
+                            .accessibilityLabel("Save directory path")
+                            .accessibilityHint("File path where notes are saved")
 
-                    Button("Browse...") {
-                        let panel = NSOpenPanel()
-                        panel.canChooseDirectories = true
-                        panel.canChooseFiles = false
-                        panel.canCreateDirectories = true
-                        panel.allowsMultipleSelection = false
-                        if panel.runModal() == .OK, let url = panel.url {
-                            saveDirectory = url.path
-                            Preferences.saveDirectory = saveDirectory
+                        Spacer()
+
+                        Button("Browse\u{2026}") {
+                            let panel = NSOpenPanel()
+                            panel.canChooseDirectories = true
+                            panel.canChooseFiles = false
+                            panel.canCreateDirectories = true
+                            panel.allowsMultipleSelection = false
+                            if panel.runModal() == .OK, let url = panel.url {
+                                saveDirectory = url.path
+                                Preferences.saveDirectory = saveDirectory
+                            }
                         }
+                        .accessibilityLabel("Browse")
+                        .accessibilityHint("Choose a folder for saving notes")
                     }
-                    .accessibilityLabel("Browse")
-                    .accessibilityHint("Choose a folder for saving notes")
                 }
             }
 
-            Section("Default Tag") {
-                TextField("e.g. quicknote (leave empty for no frontmatter)", text: $defaultTag)
-                    .textFieldStyle(.roundedBorder)
-                    .accessibilityLabel("Default tag")
-                    .accessibilityHint("Tag automatically added to every note")
-                    .onChange(of: defaultTag) { newValue in
-                        Preferences.defaultTag = newValue
-                    }
+            Section {
+                LabeledContent("Tag") {
+                    TextField("e.g. quicknote", text: $defaultTag)
+                        .textFieldStyle(.roundedBorder)
+                        .accessibilityLabel("Default tag")
+                        .accessibilityHint("Tag automatically added to every note")
+                        .onChange(of: defaultTag) { newValue in
+                            Preferences.defaultTag = newValue
+                        }
+                }
+                Text("Added as YAML frontmatter to new notes. Leave empty for no frontmatter.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            } header: {
+                Text("Default Tag")
             }
         }
         .formStyle(.grouped)
@@ -95,9 +118,37 @@ struct ShortcutRecorder: View {
 
     var body: some View {
         HStack {
-            Text(isRecording ? "Press new shortcut..." : displayString)
-                .font(.system(size: 13, design: .rounded))
-                .frame(maxWidth: .infinity, alignment: .leading)
+            if isRecording {
+                Text("Press new shortcut\u{2026}")
+                    .font(.system(size: 13))
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background {
+                        RoundedRectangle(cornerRadius: 6, style: .continuous)
+                            .strokeBorder(Color.accentColor, lineWidth: 1.5)
+                            .background(
+                                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                    .fill(Color.accentColor.opacity(0.08))
+                            )
+                    }
+            } else {
+                Text(displayString)
+                    .font(.system(size: 13, design: .monospaced))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background {
+                        RoundedRectangle(cornerRadius: 6, style: .continuous)
+                            .strokeBorder(Color.primary.opacity(0.2), lineWidth: 1)
+                            .background(
+                                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                    .fill(Color.primary.opacity(0.04))
+                            )
+                    }
+                    .shadow(color: .black.opacity(0.06), radius: 1, y: 1)
+            }
+
+            Spacer()
 
             Button(isRecording ? "Cancel" : "Change") {
                 if isRecording {
