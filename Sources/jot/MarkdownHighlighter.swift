@@ -30,7 +30,7 @@ enum MarkdownHighlighter {
             let size: CGFloat = max(14, 22 - CGFloat(level) * 2)
             return [
                 .font: NSFont.boldSystemFont(ofSize: size),
-                .foregroundColor: NSColor.systemOrange,
+                .foregroundColor: NSColor.systemYellow,
             ]
         }
 
@@ -53,12 +53,12 @@ enum MarkdownHighlighter {
 
         // Links: [text](url)
         applyRegex(linkRegex, to: textStorage, fullRange: fullRange, text: text) { _ in
-            [.foregroundColor: NSColor.systemBlue]
+            [.foregroundColor: NSColor.systemYellow]
         }
 
         // Lists: bullets and numbered
         applyRegex(listRegex, to: textStorage, fullRange: fullRange, text: text) { match in
-            return (match.range(at: 2), [.foregroundColor: NSColor.systemOrange])
+            return (match.range(at: 2), [.foregroundColor: NSColor.systemYellow])
         }
 
         // Blockquotes: ^>...

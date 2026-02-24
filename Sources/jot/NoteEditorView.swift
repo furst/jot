@@ -14,59 +14,90 @@ struct NoteEditorView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            TextField("Title (optional)", text: $title)
+        VStack(spacing: 0) {
+            // Title header
+            TextField("Title...", text: $title)
                 .textFieldStyle(.plain)
                 .font(.system(size: 18, weight: .semibold))
                 .accessibilityLabel("Note title")
                 .accessibilityHint("Optional title for the note")
+                .padding(.horizontal, 20)
+                .padding(.top, 16)
+                .padding(.bottom, 12)
 
-            // Tag chips + inline input
-            FlowLayout(spacing: 6) {
-                ForEach(tags, id: \.self) { tag in
-                    TagChip(label: tag) {
-                        tags.removeAll { $0 == tag }
-                    }
-                }
-                TextField(tags.isEmpty ? "Tags (optional)" : "", text: $tagInput)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 12))
-                    .frame(minWidth: 80, maxWidth: .infinity)
-                    .onChange(of: tagInput) { newValue in
-                        if newValue.last == "," || newValue.last == " " {
-                            commitTag(newValue)
-                        }
-                    }
-                    .onSubmit { commitTag(tagInput) }
-                    .accessibilityLabel("Tags")
-                    .accessibilityHint("Type a tag and press comma or space to add it")
-            }
+            Divider()
+                .overlay(Color.white.opacity(0.1))
 
+            // Note body
             HighlightedTextEditor(text: $noteBody)
                 .accessibilityLabel("Note body")
                 .accessibilityHint("Main content of the note")
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
 
-            HStack {
-                Spacer()
-                Button("Cancel") {
+            // Tags row
+            VStack(spacing: 0) {
+                Divider()
+                    .overlay(Color.white.opacity(0.1))
+
+                FlowLayout(spacing: 6) {
+                    ForEach(tags, id: \.self) { tag in
+                        TagChip(label: tag) {
+                            tags.removeAll { $0 == tag }
+                        }
+                    }
+                    TextField(tags.isEmpty ? "Tags..." : "", text: $tagInput)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 12))
+                        .frame(minWidth: 80, maxWidth: .infinity)
+                        .onChange(of: tagInput) { newValue in
+                            if newValue.last == "," || newValue.last == " " {
+                                commitTag(newValue)
+                            }
+                        }
+                        .onSubmit { commitTag(tagInput) }
+                        .accessibilityLabel("Tags")
+                        .accessibilityHint("Type a tag and press comma or space to add it")
+                }
+                .padding(.horizontal, 16)
+                .frame(height: 36)
+            }
+
+            // Bottom bar
+            VStack(spacing: 0) {
+                Divider()
+                    .overlay(Color.white.opacity(0.1))
+
+                HStack(spacing: 4) {
+                    KeyboardShortcutHint(label: "Save", keys: ["⌘", "↵"])
+
+                    Spacer()
+
+                    KeyboardShortcutHint(label: "Cancel", keys: ["esc"])
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(Color.black.opacity(0.2))
+            }
+        }
+        .frame(width: 560, height: 340)
+        .overlay {
+            // Hidden buttons to register keyboard shortcuts
+            VStack {
+                Button("") {
                     onCancel()
                 }
                 .keyboardShortcut(.cancelAction)
-                .accessibilityLabel("Cancel")
-                .accessibilityHint("Discard note and close editor")
-
-                Button("Save") {
+                Button("") {
                     commitTag(tagInput)
                     onSave(title, noteBody, tagsString)
                 }
                 .keyboardShortcut(.return, modifiers: .command)
                 .disabled(noteBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                .accessibilityLabel("Save")
-                .accessibilityHint("Save note to disk")
             }
+            .frame(width: 0, height: 0)
+            .opacity(0)
         }
-        .padding(20)
-        .frame(width: 560, height: 340)
     }
 
     private func commitTag(_ input: String) {
@@ -75,6 +106,32 @@ struct NoteEditorView: View {
             tags.append(cleaned)
         }
         tagInput = ""
+    }
+}
+
+// MARK: - Keyboard Shortcut Hint
+
+struct KeyboardShortcutHint: View {
+    let label: String
+    let keys: [String]
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Text(label)
+                .font(.system(size: 11))
+                .foregroundColor(.secondary)
+            HStack(spacing: 2) {
+                ForEach(keys, id: \.self) { key in
+                    Text(key)
+                        .font(.system(size: 10, weight: .medium))
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 2)
+                        .background(Color.white.opacity(0.1))
+                        .cornerRadius(3)
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
     }
 }
 

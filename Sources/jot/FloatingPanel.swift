@@ -2,6 +2,7 @@ import AppKit
 
 final class FloatingPanel: NSPanel {
     private let visualEffectView: NSVisualEffectView
+    private let contentContainer: NSView = NSView()
 
     init() {
         visualEffectView = NSVisualEffectView()
@@ -27,31 +28,51 @@ final class FloatingPanel: NSPanel {
         container.wantsLayer = true
         container.layer?.cornerRadius = 12
         container.layer?.masksToBounds = true
+        container.appearance = NSAppearance(named: .darkAqua)
         contentView = container
 
-        // Frosted glass fills the container
-        visualEffectView.material = .sidebar
+        // Frosted blur layer
+        visualEffectView.material = .hudWindow
         visualEffectView.blendingMode = .behindWindow
         visualEffectView.state = .active
         visualEffectView.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(visualEffectView)
+
+        // Dark tint over the blur, below content
+        let tintView = NSView()
+        tintView.wantsLayer = true
+        tintView.layer?.backgroundColor = NSColor.black.withAlphaComponent(0.35).cgColor
+        tintView.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(tintView)
+
+        // Content container sits above the tint
+        contentContainer.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(contentContainer)
 
         NSLayoutConstraint.activate([
             visualEffectView.topAnchor.constraint(equalTo: container.topAnchor),
             visualEffectView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
             visualEffectView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             visualEffectView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            tintView.topAnchor.constraint(equalTo: container.topAnchor),
+            tintView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            tintView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            tintView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            contentContainer.topAnchor.constraint(equalTo: container.topAnchor),
+            contentContainer.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            contentContainer.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            contentContainer.trailingAnchor.constraint(equalTo: container.trailingAnchor),
         ])
     }
 
     func setContentSwiftUI(_ view: NSView) {
         view.translatesAutoresizingMaskIntoConstraints = false
-        visualEffectView.addSubview(view)
+        contentContainer.addSubview(view)
         NSLayoutConstraint.activate([
-            view.topAnchor.constraint(equalTo: visualEffectView.topAnchor),
-            view.bottomAnchor.constraint(equalTo: visualEffectView.bottomAnchor),
-            view.leadingAnchor.constraint(equalTo: visualEffectView.leadingAnchor),
-            view.trailingAnchor.constraint(equalTo: visualEffectView.trailingAnchor),
+            view.topAnchor.constraint(equalTo: contentContainer.topAnchor),
+            view.bottomAnchor.constraint(equalTo: contentContainer.bottomAnchor),
+            view.leadingAnchor.constraint(equalTo: contentContainer.leadingAnchor),
+            view.trailingAnchor.constraint(equalTo: contentContainer.trailingAnchor),
         ])
     }
 

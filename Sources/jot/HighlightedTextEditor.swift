@@ -19,7 +19,9 @@ struct HighlightedTextEditor: NSViewRepresentable {
         textView.font = .systemFont(ofSize: 14)
         textView.textColor = .labelColor
         textView.drawsBackground = false
+        textView.insertionPointColor = .white
         textView.textContainerInset = NSSize(width: 0, height: 0)
+        textView.textContainer?.lineFragmentPadding = 0
         textView.delegate = context.coordinator
         context.coordinator.textView = textView
 
