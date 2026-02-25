@@ -6,11 +6,13 @@ final class SettingsWindowController: NSWindowController, NSToolbarDelegate {
     private enum Tab: String, CaseIterable {
         case general
         case notes
+        case about
 
         var label: String {
             switch self {
             case .general: return "General"
             case .notes: return "Notes"
+            case .about: return "About"
             }
         }
 
@@ -18,6 +20,7 @@ final class SettingsWindowController: NSWindowController, NSToolbarDelegate {
             switch self {
             case .general: return "gear"
             case .notes: return "doc.text"
+            case .about: return "info.circle"
             }
         }
 
@@ -56,6 +59,8 @@ final class SettingsWindowController: NSWindowController, NSToolbarDelegate {
             content = NSHostingView(rootView: GeneralSettingsView())
         case .notes:
             content = NSHostingView(rootView: NotesSettingsView())
+        case .about:
+            content = NSHostingView(rootView: AboutSettingsView())
         }
 
         let contentSize = content.fittingSize

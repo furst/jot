@@ -9,27 +9,31 @@ struct GeneralSettingsView: View {
 
     var body: some View {
         Form {
-            LabeledContent("Launch at Login") {
-                Toggle("", isOn: $launchAtLogin)
-                    .labelsHidden()
-                    .accessibilityLabel("Launch at Login")
-                    .accessibilityHint("Start jot automatically when you log in")
-                    .onChange(of: launchAtLogin) { newValue in
-                        do {
-                            if newValue {
-                                try SMAppService.mainApp.register()
-                            } else {
-                                try SMAppService.mainApp.unregister()
+            Section {
+                LabeledContent("Launch at Login") {
+                    Toggle("", isOn: $launchAtLogin)
+                        .labelsHidden()
+                        .accessibilityLabel("Launch at Login")
+                        .accessibilityHint("Start jot automatically when you log in")
+                        .onChange(of: launchAtLogin) { newValue in
+                            do {
+                                if newValue {
+                                    try SMAppService.mainApp.register()
+                                } else {
+                                    try SMAppService.mainApp.unregister()
+                                }
+                            } catch {
+                                launchAtLogin = !newValue
                             }
-                        } catch {
-                            launchAtLogin = !newValue
                         }
-                    }
+                }
+            } header: {
+                Text("Startup")
             }
 
             Section {
                 ShortcutRecorder()
-                Text("Press Change, then type your preferred key combination to activate jot from anywhere.")
+                Text("Press Change to record a new shortcut.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
             } header: {
@@ -58,7 +62,8 @@ struct NotesSettingsView: View {
                     HStack(spacing: 6) {
                         Image(systemName: "folder.fill")
                             .foregroundStyle(.secondary)
-                        Text(saveDirectory)
+                        Text((saveDirectory as NSString).lastPathComponent)
+                            .font(.system(size: 13, design: .monospaced))
                             .lineLimit(1)
                             .truncationMode(.middle)
                             .foregroundStyle(.primary)
@@ -203,5 +208,59 @@ struct ShortcutRecorder: View {
         if let monitor { NSEvent.removeMonitor(monitor) }
         monitor = nil
         isRecording = false
+    }
+}
+
+// MARK: - About Tab
+
+struct AboutSettingsView: View {
+    private var version: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "–"
+    }
+
+    private var build: String {
+        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "–"
+    }
+
+    private var commit: String? {
+        (Bundle.main.infoDictionary?["JotBuildCommit"] as? String).flatMap { $0.isEmpty ? nil : $0 }
+    }
+
+    var body: some View {
+        Form {
+            Section {
+                VStack(spacing: 12) {
+                    if let icon = NSImage(named: "AppIcon") {
+                        Image(nsImage: icon)
+                            .resizable()
+                            .frame(width: 80, height: 80)
+                    }
+
+                    Text("jot")
+                        .font(.title.bold())
+
+                    VStack(spacing: 4) {
+                        Text("Version \(version) (\(build))")
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+
+                        if let commit {
+                            Text(commit.prefix(7))
+                                .font(.system(size: 11, design: .monospaced))
+                                .foregroundStyle(.tertiary)
+                        }
+                    }
+
+                    Link("GitHub Repository",
+                         destination: URL(string: "https://github.com/furst/jot")!)
+                        .font(.callout)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+            }
+        }
+        .formStyle(.grouped)
+        .frame(width: 480)
+        .fixedSize(horizontal: false, vertical: true)
     }
 }
