@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jot — Quick Note Capture for macOS</title>
+  <meta name="description" content="A lightweight macOS menu bar app for capturing notes instantly. Works with Obsidian, Logseq, and any Markdown-based system.">
+  <style>
+    :root {
+      --bg: #0d0d0f;
+      --surface: #18181b;
+      --border: #27272a;
+      --text: #fafafa;
+      --text-muted: #a1a1aa;
+      --accent: #ffb800;
+      --accent-soft: rgba(255, 184, 0, 0.1);
+      --pink: #ff6b8a;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Nav */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .nav-brand svg { width: 32px; height: 32px; }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .gh-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-logo { width: 96px; height: 96px; margin-bottom: 32px; }
+    .hero h1 {
+      font-size: 3.2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .hero h1 .accent { color: var(--accent); }
+    .hero .subtitle {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      max-width: 520px;
+      margin: 0 auto 40px;
+    }
+
+    /* Install block */
+    .install-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .install-cmd {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 24px;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.85rem;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+    .install-cmd:hover { border-color: var(--accent); }
+    .install-cmd .prompt { color: var(--text-muted); user-select: none; }
+    .copy-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      transition: color 0.2s;
+      flex-shrink: 0;
+    }
+    .copy-btn:hover { color: var(--text); }
+    .install-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Shortcut badge */
+    .shortcut {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 24px;
+    }
+    .key {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-family: 'SF Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .shortcut span { color: var(--text-muted); font-size: 0.8rem; }
+
+    /* Features */
+    .features {
+      padding: 80px 0;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 28px;
+      transition: border-color 0.2s;
+    }
+    .feature-card:hover { border-color: var(--accent); }
+    .feature-icon {
+      font-size: 1.8rem;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .feature-card p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Compatible */
+    .compat {
+      padding: 60px 0 80px;
+      text-align: center;
+    }
+    .compat h2 {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-bottom: 24px;
+    }
+    .compat-logos {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+    .compat-item {
+      color: var(--text-muted);
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+    }
+    footer p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero { padding: 64px 0 48px; }
+      .hero h1 { font-size: 2.2rem; }
+      .hero .subtitle { font-size: 1.05rem; }
+      .features-grid { grid-template-columns: 1fr; gap: 16px; }
+      .install-cmd { font-size: 0.75rem; padding: 12px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="/" class="nav-brand">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="32" height="32">
+        <defs><linearGradient id="bolt" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFE44D"/><stop offset="100%" stop-color="#FFB800"/></linearGradient></defs>
+        <path d="M46,8 L70,8 C72,8 73,9 73,11 L73,14 L46,14 L46,11 C46,9 47,8 49,8 Z" fill="#FF6B8A"/>
+        <rect x="46" y="14" width="27" height="4" fill="#A0A0A0"/>
+        <path d="M73,18 L46,18 L46,56 L34,56 L59,94 L59,68 L73,68 Z" fill="url(#bolt)"/>
+        <path d="M39,94 L59,94 L49,116 Z" fill="#F0BA6A"/>
+        <path d="M44,102 L54,102 L49,116 Z" fill="#333"/>
+      </svg>
+      Jot
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="https://github.com/furst/jot" class="gh-link" target="_blank">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <svg class="hero-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+      <defs><linearGradient id="bolt2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFE44D"/><stop offset="100%" stop-color="#FFB800"/></linearGradient></defs>
+      <path d="M46,8 L70,8 C72,8 73,9 73,11 L73,14 L46,14 L46,11 C46,9 47,8 49,8 Z" fill="#FF6B8A"/>
+      <rect x="46" y="14" width="27" height="4" fill="#A0A0A0"/>
+      <path d="M73,18 L46,18 L46,56 L34,56 L59,94 L59,68 L73,68 Z" fill="url(#bolt2)"/>
+      <path d="M39,94 L59,94 L49,116 Z" fill="#F0BA6A"/>
+      <path d="M44,102 L54,102 L49,116 Z" fill="#333"/>
+    </svg>
+    <h1>Capture thoughts <span class="accent">instantly.</span></h1>
+    <p class="subtitle">A tiny macOS menu bar app that lets you jot down notes from anywhere. Markdown files, your folder, your workflow.</p>
+
+    <div class="install-block">
+      <div class="install-cmd" onclick="navigator.clipboard.writeText('curl -fsSL https://raw.githubusercontent.com/furst/Jot/main/scripts/install.sh | bash')">
+        <span class="prompt">$</span>
+        <code>curl -fsSL https://raw.githubusercontent.com/furst/Jot/main/scripts/install.sh | bash</code>
+        <button class="copy-btn" aria-label="Copy install command">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        </button>
+      </div>
+      <p class="install-note">Requires macOS 13.0+ · Builds from source with Xcode CLI Tools</p>
+    </div>
+
+    <div class="shortcut">
+      <span class="key">⌘</span>
+      <span class="key">⇧</span>
+      <span class="key">N</span>
+      <span>&nbsp;from anywhere</span>
+    </div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <div class="container">
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Lightning Fast</h3>
+        <p>Global shortcut opens a floating panel instantly. Type, save, gone. No app switching, no friction.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📝</div>
+        <h3>Plain Markdown</h3>
+        <p>Notes are saved as .md files with optional YAML frontmatter tags. No lock-in, no proprietary format.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📁</div>
+        <h3>Your Folder</h3>
+        <p>Pick any directory. Notes land exactly where you want them — your Obsidian vault, iCloud, Dropbox, wherever.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏷️</div>
+        <h3>Tag &amp; Organize</h3>
+        <p>Add tags on the fly. Set a default tag in settings so every note is categorized without extra effort.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🪟</div>
+        <h3>Frosted Glass UI</h3>
+        <p>Beautiful floating panel with macOS-native vibrancy. Feels right at home on your desktop.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👻</div>
+        <h3>Invisible Until Needed</h3>
+        <p>Lives in your menu bar. No Dock icon, no clutter. Just a quiet helper waiting for your next thought.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="compat">
+  <div class="container">
+    <h2>Works with your favorite tools</h2>
+    <div class="compat-logos">
+      <span class="compat-item">Obsidian</span>
+      <span class="compat-item">Logseq</span>
+      <span class="compat-item">iA Writer</span>
+      <span class="compat-item">Any Markdown app</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>MIT License · Built with ♥ and Swift · <a href="https://github.com/furst/jot" target="_blank">View on GitHub</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
