@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Pencil-Lightning Bolt Logo v1: Bold lightning with pencil tip and eraser -->
+
+  <!-- Eraser cap -->
+  <rect x="38" y="6" width="30" height="12" rx="3" fill="#FF6B8A"/>
+  <rect x="38" y="14" width="30" height="4" fill="#C0C0C0"/>
+
+  <!-- Lightning bolt body (pencil shaft) -->
+  <polygon points="
+    68,18
+    38,18
+    38,58
+    28,58
+    58,98
+    58,68
+    68,68
+  " fill="#FFD700"/>
+
+  <!-- Pencil tip -->
+  <polygon points="
+    38,98
+    58,98
+    48,118
+  " fill="#FFD700"/>
+
+  <!-- Exposed wood of tip -->
+  <polygon points="
+    42,98
+    54,98
+    48,110
+  " fill="#F4C78E"/>
+
+  <!-- Graphite point -->
+  <polygon points="
+    45,106
+    51,106
+    48,118
+  " fill="#333333"/>
+</svg>

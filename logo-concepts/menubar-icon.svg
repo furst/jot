@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18">
+  <!-- Menu bar version: monochrome silhouette at actual size -->
+
+  <!-- Eraser cap -->
+  <rect x="6" y="0.5" width="5" height="2" rx="0.5" fill="black"/>
+
+  <!-- Lightning body -->
+  <polygon points="
+    11,2.5
+    6,2.5
+    6,8
+    4,8
+    9,13.5
+    9,10
+    11,10
+  " fill="black"/>
+
+  <!-- Pencil tip -->
+  <polygon points="
+    5.5,13.5
+    9,13.5
+    7.25,17
+  " fill="black"/>
+</svg>

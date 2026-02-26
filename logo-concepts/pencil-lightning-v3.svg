@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Pencil-Lightning v3: Minimal/clean, single path, works at small sizes -->
+
+  <defs>
+    <linearGradient id="bolt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFE44D"/>
+      <stop offset="100%" stop-color="#FFB800"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Single unified lightning-pencil silhouette -->
+  <path d="
+    M 46,8
+    L 70,8
+    C 72,8 73,9 73,11
+    L 73,14
+    L 46,14
+    L 46,11
+    C 46,9 47,8 49,8
+    Z
+  " fill="#FF6B8A"/>
+
+  <!-- Metal band -->
+  <rect x="46" y="14" width="27" height="4" fill="#A0A0A0"/>
+
+  <!-- Lightning bolt body -->
+  <path d="
+    M 73,18
+    L 46,18
+    L 46,56
+    L 34,56
+    L 59,94
+    L 59,68
+    L 73,68
+    Z
+  " fill="url(#bolt)"/>
+
+  <!-- Pencil tip -->
+  <path d="
+    M 39,94
+    L 59,94
+    L 49,116
+    Z
+  " fill="#F0BA6A"/>
+
+  <!-- Graphite -->
+  <path d="
+    M 44,102
+    L 54,102
+    L 49,116
+    Z
+  " fill="#333"/>
+</svg>

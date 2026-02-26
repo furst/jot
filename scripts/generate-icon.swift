@@ -17,7 +17,7 @@ let iconSizes: [(String, Int)] = [
 
 func renderIcon(pixelSize: Int) -> Data {
     let s = CGFloat(pixelSize)
-    let sc = s / 1024.0
+    let sc = s / 128.0
 
     let rep = NSBitmapImageRep(
         bitmapDataPlanes: nil, pixelsWide: pixelSize, pixelsHigh: pixelSize,
@@ -36,8 +36,8 @@ func renderIcon(pixelSize: Int) -> Data {
     let bg = NSBezierPath(roundedRect: bgRect, xRadius: cornerRadius, yRadius: cornerRadius)
 
     NSGradient(colors: [
-        NSColor(calibratedRed: 0.94, green: 0.56, blue: 0.15, alpha: 1.0),  // bottom: deep orange
-        NSColor(calibratedRed: 1.0, green: 0.78, blue: 0.36, alpha: 1.0),   // top: warm amber
+        NSColor(calibratedRed: 0.94, green: 0.56, blue: 0.15, alpha: 1.0),
+        NSColor(calibratedRed: 1.0, green: 0.78, blue: 0.36, alpha: 1.0),
     ])!.draw(in: bg, angle: 90)
 
     // Subtle highlight at the top
@@ -48,74 +48,89 @@ func renderIcon(pixelSize: Int) -> Data {
         NSColor(calibratedWhite: 1.0, alpha: 0.12),
     ])!.draw(in: hl, angle: 90)
 
-    // --- Pencil (drawn upright then rotated -45°) ---
+    // --- Simplified lightning-pencil shape (matching menu bar icon) ---
+    // Draw on an 18-unit grid, then scale and position to fit the icon
+
+    let shapeH: CGFloat = 16.5  // shape spans y 1..17.5
+    let gridScale = s * 0.65 / shapeH
+    let ox = s * 0.5 - 8.5 * gridScale  // center horizontally (shape ~3..12)
+    let oy = s * 0.14                     // top padding
+
+    // Flip Y for top-down drawing
     ctx.saveGState()
-    ctx.translateBy(x: s * 0.52, y: s * 0.48)
-    ctx.rotate(by: -.pi / 4)
+    ctx.translateBy(x: 0, y: s)
+    ctx.scaleBy(x: 1, y: -1)
 
-    let bodyW: CGFloat = 120 * sc
-    let hw = bodyW / 2
+    // Apply 15° rotation around center of shape (matching menu bar icon)
+    let cx = 8.5 * gridScale + ox
+    let cy = 9.25 * gridScale + oy
+    ctx.translateBy(x: cx, y: cy)
+    ctx.rotate(by: -15 * .pi / 180)  // negative because Y is flipped
+    ctx.translateBy(x: -cx, y: -cy)
 
-    // Shadow behind pencil
-    ctx.setShadow(offset: CGSize(width: 2 * sc, height: -4 * sc), blur: 14 * sc,
+    func p(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
+        CGPoint(x: x * gridScale + ox, y: y * gridScale + oy)
+    }
+
+    // Shadow behind the shape
+    ctx.setShadow(offset: CGSize(width: 1 * sc, height: -3 * sc), blur: 8 * sc,
                   color: CGColor(gray: 0, alpha: 0.3))
-
     ctx.setFillColor(CGColor(gray: 1, alpha: 1))
 
-    // Tip (triangle)
+    // Lightning bolt body (white)
     ctx.beginPath()
-    ctx.move(to: CGPoint(x: 0, y: -340 * sc))
-    ctx.addLine(to: CGPoint(x: -hw, y: -200 * sc))
-    ctx.addLine(to: CGPoint(x: hw, y: -200 * sc))
+    ctx.move(to: p(12, 1))
+    ctx.addLine(to: p(5, 1))
+    ctx.addLine(to: p(5, 7.5))
+    ctx.addLine(to: p(3, 7.5))
+    ctx.addLine(to: p(10, 13))
+    ctx.addLine(to: p(10, 9.5))
+    ctx.addLine(to: p(12, 9.5))
     ctx.closePath()
     ctx.fillPath()
 
-    // Collar / ferrule
-    ctx.fill(CGRect(x: -hw - 8 * sc, y: -200 * sc, width: bodyW + 16 * sc, height: 36 * sc))
-
-    // Body
-    ctx.fill(CGRect(x: -hw, y: -164 * sc, width: bodyW, height: 430 * sc))
-
-    // Eraser ferrule
-    ctx.fill(CGRect(x: -hw - 8 * sc, y: 266 * sc, width: bodyW + 16 * sc, height: 30 * sc))
-
-    // Eraser cap (rounded)
-    let ecap = CGRect(x: -hw, y: 296 * sc, width: bodyW, height: 60 * sc)
-    ctx.addPath(CGPath(roundedRect: ecap, cornerWidth: 14 * sc, cornerHeight: 14 * sc, transform: nil))
+    // Pencil tip (white base)
+    ctx.beginPath()
+    ctx.move(to: p(4, 13))
+    ctx.addLine(to: p(10, 13))
+    ctx.addLine(to: p(7, 17.5))
+    ctx.closePath()
     ctx.fillPath()
 
-    // Graphite tip detail (drawn without shadow)
+    // Disable shadow for details
     ctx.setShadow(offset: .zero, blur: 0)
-    ctx.setFillColor(CGColor(srgbRed: 0.32, green: 0.32, blue: 0.36, alpha: 1.0))
+
+    // Depth shading on right side of bolt
+    ctx.setFillColor(CGColor(gray: 0.88, alpha: 0.5))
     ctx.beginPath()
-    ctx.move(to: CGPoint(x: 0, y: -340 * sc))
-    ctx.addLine(to: CGPoint(x: -hw * 0.36, y: -256 * sc))
-    ctx.addLine(to: CGPoint(x: hw * 0.36, y: -256 * sc))
+    ctx.move(to: p(10, 9.5))
+    ctx.addLine(to: p(12, 9.5))
+    ctx.addLine(to: p(12, 1))
+    ctx.addLine(to: p(9, 1))
+    ctx.addLine(to: p(9, 7.5))
+    ctx.addLine(to: p(10, 7.5))
+    ctx.closePath()
+    ctx.fillPath()
+
+    // Wood section of pencil tip
+    ctx.setFillColor(CGColor(srgbRed: 0.87, green: 0.69, blue: 0.44, alpha: 1.0))
+    ctx.beginPath()
+    ctx.move(to: p(5, 13))
+    ctx.addLine(to: p(9, 13))
+    ctx.addLine(to: p(7, 16))
+    ctx.closePath()
+    ctx.fillPath()
+
+    // Graphite point
+    ctx.setFillColor(CGColor(srgbRed: 0.18, green: 0.18, blue: 0.18, alpha: 1.0))
+    ctx.beginPath()
+    ctx.move(to: p(6, 15.5))
+    ctx.addLine(to: p(8, 15.5))
+    ctx.addLine(to: p(7, 17.5))
     ctx.closePath()
     ctx.fillPath()
 
     ctx.restoreGState()
-
-    // --- Writing squiggle near pencil tip ---
-    let sq = NSBezierPath()
-    let sx = s * 0.10
-    let sy = s * 0.13
-    sq.move(to: NSPoint(x: sx, y: sy))
-    sq.curve(to: NSPoint(x: sx + s * 0.22, y: sy + s * 0.06),
-             controlPoint1: NSPoint(x: sx + s * 0.07, y: sy + s * 0.10),
-             controlPoint2: NSPoint(x: sx + s * 0.15, y: sy - s * 0.03))
-    sq.lineWidth = max(8 * sc, 1.0)
-    sq.lineCapStyle = .round
-
-    // Subtle shadow on squiggle
-    let shadow = NSShadow()
-    shadow.shadowColor = NSColor(calibratedWhite: 0, alpha: 0.2)
-    shadow.shadowOffset = NSSize(width: 1 * sc, height: -2 * sc)
-    shadow.shadowBlurRadius = 4 * sc
-    shadow.set()
-
-    NSColor.white.setStroke()
-    sq.stroke()
 
     NSGraphicsContext.restoreGraphicsState()
     return rep.representation(using: .png, properties: [:])!

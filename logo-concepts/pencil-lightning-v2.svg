@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Pencil-Lightning v2: Upright version -->
+
+  <!-- Main lightning-pencil shape -->
+  <g>
+
+    <!-- Eraser -->
+    <rect x="44" y="4" width="24" height="10" rx="3" fill="#FF6B8A"/>
+    <rect x="44" y="11" width="24" height="3" fill="#B0B0B0"/>
+
+    <!-- Lightning body -->
+    <polygon points="
+      68,14
+      44,14
+      44,48
+      32,48
+      56,82
+      56,58
+      68,58
+    " fill="#FFD700"/>
+
+    <!-- Shadow/depth on lightning -->
+    <polygon points="
+      56,58
+      68,58
+      68,14
+      60,14
+      60,48
+      56,48
+    " fill="#E6C200" opacity="0.7"/>
+
+    <!-- Pencil tip triangle -->
+    <polygon points="
+      36,82
+      56,82
+      46,104
+    " fill="#FFD700"/>
+
+    <!-- Wood -->
+    <polygon points="
+      40,82
+      52,82
+      46,96
+    " fill="#DEB070"/>
+
+    <!-- Graphite -->
+    <polygon points="
+      43,92
+      49,92
+      46,104
+    " fill="#2D2D2D"/>
+  </g>
+</svg>
