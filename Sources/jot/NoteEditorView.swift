@@ -19,6 +19,7 @@ struct NoteEditorView: View {
             TextField("Title...", text: $title)
                 .textFieldStyle(.plain)
                 .font(.system(size: 18, weight: .semibold))
+                .tint(.white)
                 .accessibilityLabel("Note title")
                 .accessibilityHint("Optional title for the note")
                 .padding(.horizontal, 20)
@@ -49,6 +50,7 @@ struct NoteEditorView: View {
                     TextField(tags.isEmpty ? "Tags..." : "", text: $tagInput)
                         .textFieldStyle(.plain)
                         .font(.system(size: 12))
+                        .tint(.white)
                         .frame(minWidth: 80, maxWidth: .infinity)
                         .onChange(of: tagInput) { newValue in
                             if newValue.last == "," || newValue.last == " " {

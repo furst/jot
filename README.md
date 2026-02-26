@@ -1,11 +1,12 @@
 # jot
 
-A lightweight macOS menu bar app for quick note capture. Jot down thoughts instantly with a global keyboard shortcut — notes are saved as Markdown files to a directory of your choice.
+A lightweight macOS menu bar app for quick note capture. Jot down thoughts instantly with a global keyboard shortcut — notes are saved as Markdown files with YAML frontmatter to any folder you choose. Works great with Obsidian, Logseq, or any Markdown-based note system.
 
 ## Features
 
 - Global shortcut (Cmd+Shift+N) to capture notes from anywhere
 - Saves notes as Markdown with optional YAML frontmatter tags
+- Works great with Obsidian, Logseq, or any Markdown-based note system
 - Configurable save directory and default tag
 - Floating panel with frosted glass appearance
 - Runs as a menu bar app (no Dock icon)
@@ -40,7 +41,7 @@ open .build/bundle/jot.app
 ## Settings
 
 - **Save Location** — directory where notes are saved (default: `~/Documents`)
-- **Default Tag** — automatically added to every note's frontmatter
+- **Default Tag** — automatically added to every note's YAML frontmatter
 
 ## License
 
