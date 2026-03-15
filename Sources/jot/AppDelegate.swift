@@ -66,7 +66,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         let panel = FloatingPanel()
-        let editorView = NoteEditorView(onSave: { [weak self] title, body, tags in
+        let mainView = MainContentView(onSave: { [weak self] title, body, tags in
             do {
                 try NoteService.save(title: title, body: body, tags: tags)
                 self?.floatingPanel?.close()
@@ -83,7 +83,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.floatingPanel = nil
         })
 
-        let hostingView = NSHostingView(rootView: editorView)
+        let hostingView = NSHostingView(rootView: mainView)
         panel.setContentSwiftUI(hostingView)
         panel.center()
         if #available(macOS 14.0, *) {

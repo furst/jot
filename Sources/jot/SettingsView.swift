@@ -6,6 +6,7 @@ import SwiftUI
 
 struct GeneralSettingsView: View {
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
+    @State private var showSidebar = Preferences.showSidebar
 
     var body: some View {
         Form {
@@ -25,6 +26,14 @@ struct GeneralSettingsView: View {
                             } catch {
                                 launchAtLogin = !newValue
                             }
+                        }
+                }
+                LabeledContent("Show Sidebar") {
+                    Toggle("", isOn: $showSidebar)
+                        .labelsHidden()
+                        .accessibilityLabel("Show Sidebar")
+                        .onChange(of: showSidebar) { newValue in
+                            Preferences.showSidebar = newValue
                         }
                 }
             } header: {
@@ -53,6 +62,7 @@ struct GeneralSettingsView: View {
 
 struct NotesSettingsView: View {
     @State private var saveDirectory = Preferences.saveDirectory
+    @State private var dailyNotesDirectory = Preferences.dailyNotesDirectory
     @State private var defaultTag = Preferences.defaultTag
 
     var body: some View {
@@ -86,6 +96,35 @@ struct NotesSettingsView: View {
                         }
                         .accessibilityLabel("Browse")
                         .accessibilityHint("Choose a folder for saving notes")
+                    }
+                }
+            }
+
+            Section("Daily Notes") {
+                LabeledContent("Folder") {
+                    HStack(spacing: 6) {
+                        Image(systemName: "folder.fill")
+                            .foregroundStyle(.secondary)
+                        Text((dailyNotesDirectory as NSString).lastPathComponent)
+                            .font(.system(size: 13, design: .monospaced))
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                            .foregroundStyle(.primary)
+                            .help(dailyNotesDirectory)
+
+                        Spacer()
+
+                        Button("Browse\u{2026}") {
+                            let panel = NSOpenPanel()
+                            panel.canChooseDirectories = true
+                            panel.canChooseFiles = false
+                            panel.canCreateDirectories = true
+                            panel.allowsMultipleSelection = false
+                            if panel.runModal() == .OK, let url = panel.url {
+                                dailyNotesDirectory = url.path
+                                Preferences.dailyNotesDirectory = dailyNotesDirectory
+                            }
+                        }
                     }
                 }
             }

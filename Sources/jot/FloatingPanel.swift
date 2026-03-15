@@ -8,7 +8,7 @@ final class FloatingPanel: NSPanel {
         visualEffectView = NSVisualEffectView()
 
         super.init(
-            contentRect: NSRect(x: 0, y: 0, width: 560, height: 340),
+            contentRect: NSRect(x: 0, y: 0, width: 680, height: 340),
             styleMask: [.borderless],
             backing: .buffered,
             defer: true

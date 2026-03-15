@@ -3,6 +3,8 @@ import Foundation
 public enum Preferences {
     private static let saveDirectoryKey = "saveDirectory"
     private static let defaultTagKey = "defaultTag"
+    private static let dailyNotesDirectoryKey = "dailyNotesDirectory"
+    private static let showSidebarKey = "showSidebar"
     private static let shortcutKeyKey = "shortcutKey"
     private static let shortcutModifiersKey = "shortcutModifiers"
 
@@ -13,6 +15,28 @@ public enum Preferences {
         }
         set {
             UserDefaults.standard.set(newValue, forKey: saveDirectoryKey)
+        }
+    }
+
+    public static var dailyNotesDirectory: String {
+        get {
+            UserDefaults.standard.string(forKey: dailyNotesDirectoryKey)
+                ?? NSHomeDirectory() + "/Documents/Daily Notes"
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: dailyNotesDirectoryKey)
+        }
+    }
+
+    public static var showSidebar: Bool {
+        get {
+            guard UserDefaults.standard.object(forKey: showSidebarKey) != nil else {
+                return true
+            }
+            return UserDefaults.standard.bool(forKey: showSidebarKey)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: showSidebarKey)
         }
     }
 

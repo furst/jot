@@ -71,18 +71,30 @@ struct NoteEditorView: View {
                     .overlay(Color.white.opacity(0.1))
 
                 HStack(spacing: 4) {
-                    KeyboardShortcutHint(label: "Save", keys: ["⌘", "↵"])
+                    Button {
+                        commitTag(tagInput)
+                        onSave(title, noteBody, tagsString)
+                    } label: {
+                        KeyboardShortcutHint(label: "Save", keys: ["⌘", "↵"])
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(noteBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 
                     Spacer()
 
-                    KeyboardShortcutHint(label: "Cancel", keys: ["esc"])
+                    Button {
+                        onCancel()
+                    } label: {
+                        KeyboardShortcutHint(label: "Cancel", keys: ["esc"])
+                    }
+                    .buttonStyle(.plain)
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
                 .background(Color.black.opacity(0.2))
             }
         }
-        .frame(width: 560, height: 340)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay {
             // Hidden buttons to register keyboard shortcuts
             VStack {
