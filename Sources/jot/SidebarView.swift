@@ -21,6 +21,7 @@ struct SidebarView: View {
         }
         .padding(.vertical, 8)
         .frame(width: 120)
+        .background(Color.black.opacity(0.2))
     }
 }
 
